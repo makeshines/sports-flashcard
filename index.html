@@ -450,7 +450,9 @@ function retrySubj(){hideComplete();current=0;isFlipped=false;renderCard();}
 
 function toggleReview(){
   reviewMode=!reviewMode;current=0;isFlipped=false;
-  document.getElementById('btnReview').classList.toggle('review-on',reviewMode);
+  const btn=document.getElementById('btnReview');
+  btn.classList.toggle('review-on',reviewMode);
+  btn.textContent=reviewMode?'📋 전체보기':'❌ 오답만';
   document.getElementById('modePill').className='mode-pill'+(reviewMode?' wrong':'');
   document.getElementById('modePill').textContent=reviewMode?'오답 모드':'전체';
   refresh();
