@@ -138,7 +138,7 @@ body{background:#FDF8F5;color:#2C2C2A;font-family:-apple-system,'Segoe UI',sans-
 .auth-popup{position:fixed;inset:0;background:rgba(44,44,42,.6);display:flex;align-items:flex-end;justify-content:center;z-index:300;animation:fadeIn .2s}
 .auth-popup.hidden{display:none}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.auth-sheet{background:#fff;border-radius:24px 24px 0 0;padding:32px 24px 40px;width:100%;max-width:480px;animation:slideUp .3s cubic-bezier(.34,1.56,.64,1)}
+.auth-sheet{background:#fff;border-radius:24px 24px 0 0;padding:32px 24px 40px;width:100%;max-width:480px;animation:slideUp .3s cubic-bezier(.34,1.56,.64,1);position:relative}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .auth-sheet-title{font-size:22px;font-weight:700;color:#2C2C2A;margin-bottom:6px;text-align:center}
 .auth-sheet-sub{font-size:14px;color:#888780;text-align:center;margin-bottom:24px;line-height:1.6}
@@ -176,6 +176,34 @@ body{background:#FDF8F5;color:#2C2C2A;font-family:-apple-system,'Segoe UI',sans-
 .footer-brand{font-size:14px;font-weight:700;color:#2C2C2A;margin-bottom:8px}
 .footer-info{font-size:11px;color:#B4B2A9;line-height:1.9}
 .footer-info a{color:#B4B2A9;text-decoration:none}
+
+/* 할인코드 */
+.discount-wrap{margin-bottom:16px}
+.discount-label{font-size:13px;font-weight:600;color:#2C2C2A;margin-bottom:8px}
+.discount-row{display:flex;gap:8px}
+.discount-input{flex:1;padding:10px 14px;border-radius:10px;border:1.5px solid #E8E8E8;font-size:14px;outline:none}
+.discount-input:focus{border-color:#7F77DD}
+.btn-discount{padding:10px 16px;border-radius:10px;border:none;background:#F4EEF9;color:#7F77DD;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.btn-discount:active{background:#7F77DD;color:#fff}
+.discount-msg{font-size:12px;margin-top:6px;padding:6px 10px;border-radius:8px}
+.discount-msg.success{background:#E8F8F3;color:#0F6E56}
+.discount-msg.error{background:#FCEBEB;color:#A32D2D}
+
+/* 오류 신고 */
+.report-btn{width:100%;margin-top:10px;padding:10px;border-radius:var(--radius-sm);border:1.5px solid #FAC775;background:#FFF9F0;color:#BA7517;font-size:12px;font-weight:600;cursor:pointer}
+.report-sheet{position:fixed;inset:0;background:rgba(44,44,42,.6);display:flex;align-items:flex-end;justify-content:center;z-index:300}
+.report-sheet.hidden{display:none}
+.report-box{background:#fff;border-radius:24px 24px 0 0;padding:24px 20px 36px;width:100%;max-width:480px}
+.report-title{font-size:16px;font-weight:700;margin-bottom:4px}
+.report-sub{font-size:12px;color:#888780;margin-bottom:16px}
+.report-types{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.report-type{padding:6px 14px;border-radius:20px;border:1.5px solid #E8E8E8;background:#fff;font-size:12px;font-weight:600;color:#888780;cursor:pointer}
+.report-type.selected{border-color:#D4537E;background:#FFF0F5;color:#D4537E}
+.report-textarea{width:100%;padding:12px;border-radius:10px;border:1.5px solid #E8E8E8;font-size:13px;resize:none;outline:none;font-family:inherit}
+.report-textarea:focus{border-color:#7F77DD}
+.report-btns{display:flex;gap:8px;margin-top:12px}
+.btn-report-cancel{flex:1;padding:12px;border-radius:10px;border:none;background:#F4EEF9;color:#7F77DD;font-size:14px;font-weight:600;cursor:pointer}
+.btn-report-submit{flex:1;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#D4537E,#7F77DD);color:#fff;font-size:14px;font-weight:600;cursor:pointer}
 </style>
 </head>
 <body>
@@ -245,6 +273,26 @@ body{background:#FDF8F5;color:#2C2C2A;font-family:-apple-system,'Segoe UI',sans-
   </div>
 </div>
 
+<!-- 오류 신고 시트 -->
+<div class="report-sheet hidden" id="reportSheet">
+  <div class="report-box">
+    <div class="report-title">⚠️ 문제 오류 신고</div>
+    <div class="report-sub" id="reportSubTitle"></div>
+    <div class="report-types">
+      <div class="report-type" onclick="selectReportType(this,'정답 오류')">정답 오류</div>
+      <div class="report-type" onclick="selectReportType(this,'보기 오류')">보기 오류</div>
+      <div class="report-type" onclick="selectReportType(this,'해설 오류')">해설 오류</div>
+      <div class="report-type" onclick="selectReportType(this,'오타')">오타</div>
+      <div class="report-type" onclick="selectReportType(this,'기타')">기타</div>
+    </div>
+    <textarea class="report-textarea" id="reportDetail" rows="3" placeholder="오류 내용을 자세히 적어주세요."></textarea>
+    <div class="report-btns">
+      <button class="btn-report-cancel" onclick="closeReport()">취소</button>
+      <button class="btn-report-submit" onclick="submitReport()">신고하기</button>
+    </div>
+  </div>
+</div>
+
 <!-- 로그인 팝업 -->
 <div class="auth-popup hidden" id="loginPopup">
   <div class="auth-sheet">
@@ -267,6 +315,7 @@ body{background:#FDF8F5;color:#2C2C2A;font-family:-apple-system,'Segoe UI',sans-
 <!-- 이용권 팝업 -->
 <div class="auth-popup hidden" id="planPopup">
   <div class="auth-sheet">
+    <button onclick="hidePlanPopup()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;color:#888780;cursor:pointer;line-height:1">✕</button>
     <div class="plan-sheet-title">⏰ 50문제 무료 체험 완료!</div>
     <div class="plan-sheet-sub" id="planSub">이용권 구매 후 전체 248문제와 학습 기록을 계속 이용할 수 있습니다.</div>
     <div class="plan-stats" id="planStats"></div>
@@ -294,6 +343,14 @@ body{background:#FDF8F5;color:#2C2C2A;font-family:-apple-system,'Segoe UI',sans-
         </div>
         <div class="plan-card-desc">28일 전체 이용</div>
       </div>
+    </div>
+    <div class="discount-wrap">
+      <div class="discount-label">🎟 할인코드가 있으신가요?</div>
+      <div class="discount-row">
+        <input class="discount-input" id="discountInput" placeholder="코드 입력 (예: TEST01)" maxlength="10">
+        <button class="btn-discount" onclick="applyDiscount()">적용</button>
+      </div>
+      <div class="discount-msg" id="discountMsg" style="display:none"></div>
     </div>
     <div class="bank-info">
       <strong>입금 계좌</strong><br>
@@ -551,6 +608,97 @@ async function saveTrialCount() {
   try {
     await db.collection('users').doc(currentUser.uid).update({ trialCount });
   } catch(e) { console.error('trialCount 저장 오류:', e); }
+}
+
+// ===== 할인코드 =====
+async function applyDiscount() {
+  if (!currentUser) { showLoginPopup(); return; }
+  const code = document.getElementById('discountInput').value.trim().toUpperCase();
+  const msgEl = document.getElementById('discountMsg');
+  if (!code) return;
+  msgEl.style.display = 'none';
+  try {
+    const ref = db.collection('discountCodes').doc(code);
+    const doc = await ref.get();
+    if (!doc.exists || doc.data().used) {
+      msgEl.className = 'discount-msg error';
+      msgEl.textContent = '유효하지 않거나 이미 사용된 코드입니다.';
+      msgEl.style.display = 'block';
+      return;
+    }
+    const data = doc.data();
+    const expireAt = new Date();
+    expireAt.setDate(expireAt.getDate() + (data.days || 7));
+    // 코드 사용 처리
+    await ref.update({
+      used: true,
+      usedBy: currentUser.uid,
+      usedByEmail: currentUser.email,
+      usedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    // 유저 플랜 활성화
+    await db.collection('users').doc(currentUser.uid).update({
+      plan: 'ACTIVE',
+      expireAt: firebase.firestore.Timestamp.fromDate(expireAt),
+      planDays: data.days || 7
+    });
+    userPlan = 'ACTIVE';
+    updateAuthBar();
+    hidePlanPopup();
+    msgEl.style.display = 'none';
+    alert('1주일 무료 이용권이 적용되었습니다! 만료일: ' + expireAt.toLocaleDateString('ko-KR'));
+    refresh();
+  } catch(e) {
+    msgEl.className = 'discount-msg error';
+    msgEl.textContent = '오류가 발생했습니다. 다시 시도해주세요.';
+    msgEl.style.display = 'block';
+  }
+}
+
+// ===== 오류 신고 =====
+let selectedReportType = '';
+
+function openReport() {
+  const card = filtered[current];
+  if (!card) return;
+  document.getElementById('reportSubTitle').textContent = card.q.length > 30 ? card.q.slice(0,30)+'...' : card.q;
+  selectedReportType = '';
+  document.querySelectorAll('.report-type').forEach(t => t.classList.remove('selected'));
+  document.getElementById('reportDetail').value = '';
+  document.getElementById('reportSheet').classList.remove('hidden');
+}
+
+function closeReport() {
+  document.getElementById('reportSheet').classList.add('hidden');
+}
+
+function selectReportType(el, type) {
+  selectedReportType = type;
+  document.querySelectorAll('.report-type').forEach(t => t.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+async function submitReport() {
+  if (!selectedReportType) { alert('오류 유형을 선택해주세요.'); return; }
+  const detail = document.getElementById('reportDetail').value.trim();
+  const card = filtered[current];
+  try {
+    await db.collection('reports').add({
+      question: card.q,
+      subject: card.s,
+      cardIndex: D.findIndex(c => c.q === card.q && c.s === card.s),
+      errorType: selectedReportType,
+      detail: detail || '',
+      reporterUid: currentUser ? currentUser.uid : 'guest',
+      reporterEmail: currentUser ? currentUser.email : '비회원',
+      status: 'pending',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    closeReport();
+    alert('✅ 신고가 접수되었습니다. 감사합니다!');
+  } catch(e) {
+    alert('오류가 발생했습니다: ' + e.message);
+  }
 }
 
 // ===== 접근 권한 체크 =====
@@ -1010,6 +1158,7 @@ function renderCard(){
   const starCount=card.star||0;
   const starDot=(!card.w&&starCount>0)?'<div class="star-dot">'+'⭐'.repeat(starCount)+'</div>':'';
   const learnHTML=isFlipped?buildLearnHTML(card):'';  // always show when flipped
+  const reportBtn=isFlipped?`<button class="report-btn" onclick="openReport()">⚠️ 문제 오류 신고</button>`:''; 
   const hintText=isFlipped?'':'탭해서 뒤집기 💫';
   area.innerHTML=
     '<div class="subj-tag">'+card.s+'</div>'
@@ -1023,7 +1172,8 @@ function renderCard(){
     +'<div class="card-text">'+card.a+'</div></div>'
     +'</div></div>'
     +'<div class="tap-hint">'+hintText+'</div>'
-    +learnHTML;
+    +learnHTML
+    +reportBtn;
 }
 
 function flipCard(){
