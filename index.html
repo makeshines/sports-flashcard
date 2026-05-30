@@ -171,6 +171,11 @@ body{background:#FDF8F5;color:#2C2C2A;font-family:-apple-system,'Segoe UI',sans-
 .btn-payment{width:100%;padding:16px;border-radius:var(--radius-sm);border:none;background:linear-gradient(135deg,#D4537E,#7F77DD);color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px}
 .btn-payment:active{transform:scale(.98)}
 .payment-note{font-size:11px;color:#B4B2A9;text-align:center;line-height:1.6}
+
+.footer{background:#fff;border-top:1px solid #F0F0F0;padding:24px 20px;text-align:center}
+.footer-brand{font-size:14px;font-weight:700;color:#2C2C2A;margin-bottom:8px}
+.footer-info{font-size:11px;color:#B4B2A9;line-height:1.9}
+.footer-info a{color:#B4B2A9;text-decoration:none}
 </style>
 </head>
 <body>
@@ -214,6 +219,14 @@ body{background:#FDF8F5;color:#2C2C2A;font-family:-apple-system,'Segoe UI',sans-
   <button class="bar-btn" id="btnReview" onclick="toggleReview()">❌ 오답만</button>
   <button class="bar-btn" onclick="shuffle()">🔀 섞기</button>
   <button class="bar-btn" onclick="resetWrong()">🔄 초기화</button>
+</div>
+<div class="footer">
+  <div class="footer-brand">CertLab</div>
+  <div class="footer-info">
+    상호명: 프사오도담 · 사업자등록번호: 453-01-02999<br>
+    주소: 세종시 보듬3로 8-20 한신휴시티 102호<br>
+    © 2025 CertLab. All rights reserved.
+  </div>
 </div>
 <div class="overlay hidden" id="completeOv">
   <div class="ov-icon" id="ovIcon">🎯</div>
