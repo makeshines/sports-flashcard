@@ -284,10 +284,9 @@ body{background:#FDF8F5;color:#2C2C2A;font-family:-apple-system,'Segoe UI',sans-
     </div>
     <div class="bank-info">
       <strong>입금 계좌</strong><br>
-      카카오뱅크 3333-XXXX-XXXX<br>
-      예금주: 홍길동<br><br>
-      입금자명에 <strong>가입 이메일 앞 4자리</strong>를 적어주세요.<br>
-      예) abcd@gmail.com → <strong>abcd</strong>
+      토스뱅크 1000-2406-0293<br>
+      예금주: 박성환<br><br>
+      신청 후 입금 완료 시 <strong>1시간 이내</strong> 승인됩니다.
     </div>
     <button class="btn-payment" id="btnPayment" onclick="submitPayment()">입금 완료 신청</button>
     <div class="payment-note">평일 기준 24시간 이내 승인됩니다.<br>승인 후 이용권이 즉시 활성화됩니다.</div>
@@ -399,6 +398,11 @@ async function loadUserData() {
           if (idx !== -1) D[idx].fav = true;
         });
       }
+      // 푼 횟수 복원
+      if (data.solveCount) {
+        solveCount = data.solveCount;
+        document.getElementById('statCount').textContent = solveCount;
+      }
       updateStats();
       buildBar();
       renderCard();
@@ -413,7 +417,7 @@ async function saveUserData() {
     const wrongList = D.filter(c=>c.w).map(c=>c.s+'||'+c.q);
     const favoriteList = D.filter(c=>c.fav).map(c=>c.s+'||'+c.q);
     await db.collection('userData').doc(currentUser.uid).set({
-      wrongList, favoriteList,
+      wrongList, favoriteList, solveCount,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
   } catch(e) { console.error('저장 오류:', e); }
@@ -1019,6 +1023,7 @@ function countUp(){
   solveCount++;
   document.getElementById('statCount').textContent=solveCount;
   checkMilestone(solveCount);
+  if(currentUser) saveUserData();
 }
 function checkMilestone(n){
   const m=MILESTONES.find(m=>m.n===n&&!passedMilestones.has(n));
@@ -1044,17 +1049,26 @@ function navigate(dir){
 }
 
 function toggleWrong(){
+  if(!currentUser){showLoginPopup();return;}
   filtered=getFiltered();
   if(!filtered.length)return;
   const card=filtered[current];
   const idx=cards.findIndex(c=>c.q===card.q&&c.s===card.s);
-  if(idx!==-1)cards[idx].w=!cards[idx].w;
-  countUp();
-  if(reviewMode&&!cards[idx].w){
-    filtered=getFiltered();
-    if(current>=filtered.length)current=Math.max(0,filtered.length-1);
+  if(idx!==-1)cards[idx].w=true;
+  updateStats();buildBar();
+  saveUserData();
+  // 오답 표시 후 다음 문제로 이동
+  if(current<filtered.length-1){
+    if(!canAccess())return;
+    countUp();
+    if(userPlan==='GUEST') guestCount++;
+    if(userPlan==='FREE_TRIAL'){trialCount++;saveTrialCount();}
+    isFlipped=false;learnOpen=false;current++;renderCard();
+  } else if(isSubjEnd()){
+    showComplete();
+  } else {
+    renderCard();
   }
-  updateStats();buildBar();renderCard();
 }
 
 function showComplete(){
